@@ -10,7 +10,7 @@ const bucket = new gcp.storage.Bucket('my-bucket', {
 export const bucketName = bucket.url;
 
 // Create a Network
-const network = new gcp.compute.Network('test-vpc-network',{ mtu: 1500 });
+const network = new gcp.compute.Network('test-vpc-network',{ mtu: 1500 , autoCreateSubnetworks: true});
 
 export const networkIpV4 = network.gatewayIpv4;
 
@@ -35,7 +35,7 @@ const defaultInstance = new gcp.compute.Instance('test-pulumi', {
     metadata: {
         foo: 'bar',
     },
-    desiredStatus: 'TERMINATED',
+    desiredStatus: 'RUNNING',
     metadataStartupScript: 'echo hi > /test.txt',
     serviceAccount: {
         email: defaultAccount.email,
@@ -43,4 +43,15 @@ const defaultInstance = new gcp.compute.Instance('test-pulumi', {
     },
 });
 
-export const instance = defaultInstance.id;
+export const computeInstance = defaultInstance.id;
+
+const instance = new gcp.sql.DatabaseInstance("test-sql-instance", {
+    databaseVersion: "POSTGRES_11",
+    settings: {
+        tier: "db-f1-micro",
+    },
+
+    deletionProtection: false,
+});
+
+export const sqlInstance = instance.masterInstanceName;
